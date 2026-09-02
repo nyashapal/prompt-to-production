@@ -1,13 +1,24 @@
 skills:
-  - name: retrieve_documents
-    description: Loads the three supplied policy documents and indexes their numbered sections by document name and section number.
-    input: Policy directory path containing policy_hr_leave.txt, policy_it_acceptable_use.txt, and policy_finance_reimbursement.txt.
-    output: Structured mapping of document names to numbered policy sections and their source text.
-    error_handling: Fails clearly if a required document is missing or contains no numbered sections.
 
-  - name: answer_question
-    description: Finds a directly supported answer in one policy document and returns the answer with its document and section citation, or the exact refusal template.
-    input: Employee policy question as text plus the indexed policy documents.
-    output: Single-source policy answer with document and section citation, or the exact refusal template.
-    error_handling: Refuses when the question is unsupported, ambiguous across documents, or cannot be answered without combining sources or adding assumptions.
-  
+&#x20; - name: retrieve\_documents
+
+&#x20;   description: Loads the three supplied policy documents and indexes their numbered sections by document name and section number.
+
+&#x20;   input: Policy directory path containing the three required policy files.
+
+&#x20;   output: Dictionary mapping each document filename to its numbered sections and section text.
+
+&#x20;   error\_handling: Fails clearly if a required document is missing or contains no numbered sections.
+
+
+
+&#x20; - name: answer\_question
+
+&#x20;   description: Answers a policy question using exactly one policy document section or returns the exact refusal template.
+
+&#x20;   input: User question and indexed policy documents.
+
+&#x20;   output: Source-grounded answer with document and section citation, or the exact refusal template.
+
+&#x20;   error\_handling: Refuses when the evidence is ambiguous, unsupported, or would require combining documents.
+

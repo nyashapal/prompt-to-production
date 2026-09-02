@@ -67,50 +67,49 @@ KNOWN_ROUTES = {
         "policy_finance_reimbursement.txt",
         "2.6",
     ),
+    "personal phone": ("policy_it_acceptable_use.txt", "3.1"),
+    "personal device": ("policy_it_acceptable_use.txt", "3.1"),
+    "work files": ("policy_it_acceptable_use.txt", "3.1"),
 }
 
 
 def parse_sections(text):
-    """
-    Extract numbered sections without allowing decorative headings
-    to become part of the previous section.
-
-    A section starts at a line containing a number such as 2.3.
-    """
     lines = text.splitlines()
-
     sections = {}
     current_number = None
     current_lines = []
 
     section_pattern = re.compile(r"^\s*(\d+\.\d+)\s+(.*)$")
+    heading_pattern = re.compile(r"^\s*(\d+)\.\s+.*$")
+
+    def save_current():
+        if current_number is not None:
+            body = " ".join(current_lines).strip()
+            body = re.sub(r"\s+", " ", body)
+            if body:
+                sections[current_number] = body
 
     for line in lines:
-        match = section_pattern.match(line)
+        section_match = section_pattern.match(line)
 
-        if match:
-            if current_number is not None:
-                body = " ".join(current_lines).strip()
-                body = re.sub(r"\s+", " ", body)
-                if body:
-                    sections[current_number] = body
+        if section_match:
+            save_current()
+            current_number = section_match.group(1)
+            current_lines = [section_match.group(2)]
+            continue
 
-            current_number = match.group(1)
-            current_lines = [match.group(2)]
-        elif current_number is not None:
-            # Ignore obvious decorative separator lines.
+        if heading_pattern.match(line):
+            save_current()
+            current_number = None
+            current_lines = []
+            continue
+
+        if current_number is not None:
             stripped = line.strip()
-
             if stripped and not re.fullmatch(r"[^A-Za-z0-9]+", stripped):
                 current_lines.append(stripped)
 
-    if current_number is not None:
-        body = " ".join(current_lines).strip()
-        body = re.sub(r"\s+", " ", body)
-
-        if body:
-            sections[current_number] = body
-
+    save_current()
     return sections
 
 
